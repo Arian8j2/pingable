@@ -1,5 +1,5 @@
 CC      := gcc
-CFLAGS  := -Wall -Wextra -Werror -std=c11 -pedantic
+CFLAGS  := -Wall -Wextra -Werror -std=c11 -pedantic -static
 
 pingable: main.c
 	$(CC) $(CFLAGS) $< -o $@
