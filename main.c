@@ -1,7 +1,9 @@
+#include <arpa/inet.h>
 #include <linux/filter.h>
 #include <netinet/in.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/socket.h>
 
 #define SO_ATTACH_FILTER 26
@@ -31,6 +33,20 @@ int32_t main() {
     if (sock == -1) {
         perror("couldn't create raw icmp socket");
         return 1;
+    }
+
+    const char *bind_addr = getenv("BIND_ADDR");
+    if (bind_addr) {
+        struct sockaddr_in addr = { 0 };
+        addr.sin_family = AF_INET;
+        if (inet_pton(AF_INET, bind_addr, &addr.sin_addr) != 1) {
+            fprintf(stderr, "invalid bind address '%s'\n", bind_addr);
+            return 1;
+        }
+        if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) == -1) {
+            perror("couldn't bind socket");
+            return 1;
+        }
     }
 
     struct sock_fprog prog = {
