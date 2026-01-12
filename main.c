@@ -15,12 +15,10 @@ const uint16_t MAX_SEQ = 100;
 // compiled using `bpf_asm -c`
 // read https://www.kernel.org/doc/html/v5.12/networking/filter.html#bpf-engine-and-instruction-set for more infos
 struct sock_filter BPF_FILTER[] = {
-    { 0x30, 0, 0, 0x00000009 },         // ldb [9]           ; protocol
-    { 0x15, 0, 5, 0x00000001 },         // jneq #1, drop     ; icmp
-    { 0x30, 0, 0, 0x00000014 },         // ldb [20]          ; icmp type
-    { 0x15, 0, 3, 0x00000008 },         // jneq #8, drop     ; icmp echo request
     { 0x28, 0, 0, 0x0000001a },         // ldh [26]          ; icmp sequence
-    { 0x25, 1, 0, (uint32_t) MAX_SEQ }, // jgt #seq, drop
+    { 0x25, 3, 0, (uint32_t) MAX_SEQ }, // jgt #seq, drop
+    { 0x30, 0, 0, 0x00000014 },         // ldb [20]          ; icmp type
+    { 0x15, 0, 1, 0x00000008 },         // jneq #8, drop     ; icmp echo request
     { 0x06, 0, 0, 0xffffffff },         // ret #-1
     { 0x06, 0, 0, 0000000000 },         // drop: ret #0
 };
